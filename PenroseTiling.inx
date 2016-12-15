@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<inkscape-extension xmlns="http://www.inkscape.org/namespace/inkscape/extension">
+  <_name>Penrose Tiling</_name>
+  <id>AmiableAnteater.lasertools.penrose_tiling</id>
+  
+  <param name="unit" _gui-text="Unit" type="enum">
+    <item value="mm">mm</item>
+    <item value="cm">cm</item>
+    <item value="in">in</item>
+  </param>
+
+  <param name="radius" type="float" precision="3"  min="1.0" max="1000.0" _gui-text="Radius">50.0</param> 
+  <param name="subdivisions" type="int" min="0" max="8">4</param>
+  <param name="linewidth" type="float" precision="3" min="0.0" max="1.0" _gui-text="Linewidth">0.01</param>
+  
+  <effect>
+    <object-type>all</object-type>
+    <effects-menu>
+      <submenu _name="FabLab Laser Tools" />
+    </effects-menu>
+  </effect>
+
+  <script>
+    <command reldir="extensions" interpreter="python">PenroseTiling.py</command>
+  </script>
+</inkscape-extension>

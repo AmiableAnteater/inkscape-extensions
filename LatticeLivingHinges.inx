@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<inkscape-extension xmlns="http://www.inkscape.org/namespace/inkscape/extension">
+    <_name>Lattice Living Hinges</_name>
+    <id>AmiableAnteater.lasertools.latticelivinghinges</id>
+
+    <param name='active-tab' type="notebook">
+        <page name="title" _gui-text="Options">
+            <param name="unit" _gui-text="Unit" type="enum">
+                <item value="mm">mm</item>
+                <item value="cm">cm</item>
+                <item value="in">in</item>
+            </param>
+
+            <param name="useHairlines" type="boolean" _gui-text="Use hairlines instead of cut-outs?"
+                   _gui-description="If this box is checked, the openings of the lattice structure will be generated single lines instead of outlines All width parameters for the cuts will be ignored">
+                true
+            </param>
+
+            <param name="count_cuts" type="int" min="1.0" max="50" _gui-text="Number of even/odd cut pairs">10</param>
+            <param name="hinge_height" type="float" precision="3" min="1.0" max="1000.0"
+                   _gui-text="Total height of the hinge">50.0</param>
+        </page>
+        <page name="odd" _gui-text="Odd columns">
+            <param name="length0" type="float" precision="3" min="1.0" max="100.0" _gui-text="Cut length of odd cuts">22.0</param>
+            <param name="width0" type="float" precision="3" min="0.1" max="10.0" _gui-text="Width of odd cuts">0.5</param>
+            <param name="vspacing0" type="float" precision="3" min="0.1" max="100.0"
+                   _gui-text="Spacing between the end of one odd cut and the beginning of the next one">2.0</param>
+            <param name="hspacing0" type="float" precision="3" min="0.1" max="100.0"
+                   _gui-text="Spacing between an odd cut and an even cut">0.5</param>
+            <param name="voffset0" type="float" precision="3" min="-100.0" max="100.0"
+                   _gui-text="Vertical offset of the odd cuts">0.0</param>
+        </page>
+        <page name='even' _gui-text='Even columns'>
+            <param name="length1" type="float" precision="3" min="1.0" max="100.0" _gui-text="Cut length of even cuts">10.0</param>
+            <param name="width1" type="float" precision="3" min="0.1" max="10.0" _gui-text="Width of even cuts">0.5</param>
+            <param name="vspacing1" type="float" precision="3" min="0.1" max="100.0"
+                   _gui-text="Spacing between the end of one even cut and the beginning of the next one">2.0</param>
+            <param name="hspacing1" type="float" precision="3" min="0.1" max="100.0"
+                   _gui-text="Spacing between an even cut and an odd cut">0.5</param>
+            <param name="voffset1" type="float" precision="3" min="-100.0" max="100.0"
+                   _gui-text="Vertical offset of the even cuts">6.0</param>
+        </page>
+    </param>
+
+    <effect>
+        <object-type>all</object-type>
+        <effects-menu>
+            <submenu _name="FabLab Laser Tools"/>
+        </effects-menu>
+    </effect>
+
+    <script>
+        <command reldir="extensions" interpreter="python">LatticeLivingHinges.py</command>
+    </script>
+</inkscape-extension>

@@ -44,7 +44,8 @@ class Point(object):
         return str(self) == str(other)
 
     def __hash__(self):
-        return self.__str__().__hash__()
+        hash = self.__str__().__hash__()
+        return hash
 
 
 class PenroseTriangle(object):
@@ -79,12 +80,17 @@ class PenroseTiling(SvgBasics.BaseEffectExtension):
         return result
 
 
-    def _drawLine(self, startPoint, endPoint, style):
-        if (startPoint, endPoint) in self.drawnLines or (endPoint, startPoint) in self.drawnLines:
-            return
-        edge = 'M ' + str(startPoint) + " L" + str(endPoint)
-        self._addPathToDocumentTree(style, edge)
-        self.drawnLines.add((startPoint, endPoint))
+    def _drawLine(self, startPoint, endPoint, style, lineArr=None):
+        sP = str(startPoint)
+        eP = str(endPoint)
+        normed = ' '.join(sorted([sP, eP]))
+        if normed not in self.drawnLines:
+            edge = 'M' + sP + ' L' + eP
+            self.drawnLines.add(normed)
+            if lineArr is None:
+                self._addPathToDocumentTree(style, edge)
+            else:
+                lineArr.append(edge)
 
     def effect(self):
         self.radius = self._conv(self.options.radius)
@@ -102,15 +108,18 @@ class PenroseTiling(SvgBasics.BaseEffectExtension):
             triangles.append(triangle)
 
         # Perform subdivisions
-        for i in xrange(self.options.subdivisions):
+        for i in xrange(self.options.recursions):
             triangles = self.subdivide(triangles)
 
         self.drawnLines = set()
         style = simplestyle.formatStyle(
             {'stroke': '#000000', 'stroke-width': str(self.linewidth), 'fill': 'none', 'stroke-linecap': 'round'})
+        lineArr = [] if self.options.combineLines else None
         for triangle in triangles:
-            self._drawLine(triangle.pointA, triangle.pointB, style)
-            self._drawLine(triangle.pointC, triangle.pointA, style)
+            self._drawLine(triangle.pointA, triangle.pointB, style, lineArr)
+            self._drawLine(triangle.pointC, triangle.pointA, style, lineArr)
+        if self.options.combineLines:
+            self._addPathToDocumentTree(style, ' '.join(lineArr))
 
 
 # Create effect instance and apply it.

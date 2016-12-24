@@ -1,26 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <inkscape-extension xmlns="http://www.inkscape.org/namespace/inkscape/extension">
-  <_name>Penrose Tiling</_name>
-  <id>AmiableAnteater.lasertools.penrose_tiling</id>
-  
-  <param name="unit" _gui-text="Unit" type="enum">
-    <item value="mm">mm</item>
-    <item value="cm">cm</item>
-    <item value="in">in</item>
-  </param>
+    <_name>Penrose Tiling</_name>
+    <id>AmiableAnteater.lasertools.penrose_tiling</id>
 
-  <param name="radius" type="float" precision="3"  min="1.0" max="1000.0" _gui-text="Radius">50.0</param> 
-  <param name="subdivisions" type="int" min="0" max="8">4</param>
-  <param name="linewidth" type="float" precision="3" min="0.0" max="1.0" _gui-text="Linewidth">0.01</param>
-  
-  <effect>
-    <object-type>all</object-type>
-    <effects-menu>
-      <submenu _name="FabLab Laser Tools" />
-    </effects-menu>
-  </effect>
+    <_param name="help01" type="description">This extension generates a penrose tiling.</_param>
+    <_param name="help02" type="description">Starting with a "circle" of 10 triangles, it recursively subdives each triangle according to the Penrose rules.</_param>
+    <_param name="help03" type="description">You have to be a bit careful when specifying the nuber of recursions - 8 recursions will yield 16030 edges, which will slow down Inkscape quite a bit.</_param>
+    <_param name="help04" type="description">If the flexibility of single edges is not necessary, you can merge them into one path, which will increase the speed dramatically.</_param>
+    <_param name="help05" type="description">If you intend to laser-cut the tiles do</_param>
+    <_param name="help06" type="description">1) merge all edges</_param>
+    <_param name="help07" type="description">2) set the line width to a reasonable width (e.g. =1 mm)</_param>
+    <_param name="help08" type="description">3) after the tiling has rendered do Path ? Stroke to path</_param>
+    <_param name="help08" type="description">4) set the fill to None and use a hairline stroke
+    </_param>
 
-  <script>
-    <command reldir="extensions" interpreter="python">PenroseTiling.py</command>
-  </script>
+    <param name="unit" _gui-text="Unit" type="enum">
+        <item value="mm">mm</item>
+        <item value="cm">cm</item>
+        <item value="in">in</item>
+    </param>
+    <param name="radius" type="float" precision="3" min="1.0" max="1000.0" _gui-text="Radius">50.0</param>
+    <param name="recursions" type="int" min="1" max="8" _gui-text="Number of recursions">4</param>
+    <param name="linewidth" type="float" precision="3" min="0.0" max="3.0" _gui-text="Width of lines">1.0</param>
+    <param name="combineLines" type="boolean" _gui-text="Merge all edges">true</param>
+
+    <effect>
+        <object-type>all</object-type>
+        <effects-menu>
+            <submenu _name="FabLab Laser Tools"/>
+        </effects-menu>
+    </effect>
+
+    <script>
+        <command reldir="extensions" interpreter="python">PenroseTiling.py</command>
+    </script>
 </inkscape-extension>

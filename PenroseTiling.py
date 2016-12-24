@@ -4,6 +4,9 @@
 """
 Generates a Penrose tiling.
 
+Major portions of the code are adapted from http://preshing.com/20110831/penrose-tiling-explained/
+Mr. Jeff Preshing was kind enough to grant me unconditional right to re-use and adapt his code.
+
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or

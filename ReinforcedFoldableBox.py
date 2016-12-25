@@ -41,24 +41,19 @@ class FoldableBox(SvgBasics.BaseEffectExtension):
 
         style = simplestyle.formatStyle({'stroke': '#000000', 'stroke-width': str(self._linewidth), 'fill': '#808080'})
 
-        # Top left flap
         outline = SvgBasics.moveAbs(2 * self._height, 2 * overlap * self._width)
 
-        outline += SvgBasics.lineRel(-latch_perc * self._height, (1 - latch_perc) * .25 * self._width)
-        outline += SvgBasics.lineRel(0, latch_perc * .5 * self._width)
-        outline += SvgBasics.lineRel(latch_perc * self._height, (1 - latch_perc) * .25 * self._width)
+        # Top left flap
+        outline += SvgBasics.circRel(.5 * self._width, False, False, -.5 * self._width, .5 * self._width)
 
         # second flap with latch
-        outline += SvgBasics.lineRel(-.5 * self._width, 0)
-        outline += SvgBasics.lineRel(0, overlapped_half * self._height)
-        outline += SvgBasics.moveRel(0, -overlap * self._height)
-        outline += SvgBasics.lineRel(- (1-latch_perc) * .5 * self._width, -overlap * self._height)
-        outline += SvgBasics.lineRel(-.1 * self._width, 0)
-        outline += SvgBasics.lineRel(0, overlapped_half * self._height)
-        outline += SvgBasics.lineRel(.1 * self._width + (1-latch_perc) * .5 * self._width + .5 * self._width, 0)
+        outline += SvgBasics.lineRel(0, .25 * self._height)
+        # this is the point to add a cut line
+        outline += SvgBasics.lineRel(-.3 * .5 * self._width, 0)
+        outline += SvgBasics.lineRel(0, .75 * self._height)
 
         # central flap
-        outline += SvgBasics.lineRel(-2 * self._height, 0)
+        outline += SvgBasics.lineRel(1.3 * .5 * self._width - 2 * self._height, 0)
         outline += SvgBasics.lineRel(0, self._width)
         outline += SvgBasics.lineRel(2 * self._height, 0)
 
@@ -122,6 +117,15 @@ class FoldableBox(SvgBasics.BaseEffectExtension):
         outline += SvgBasics.lineRel(-.4 * self._depth, 2 * overlap * self._width)
 
         self._addPathToDocumentTree(style, outline)
+
+        cutline = SvgBasics.moveAbs(2 * self._height - .5 * self._width, 2 * overlap * self._width + .5 * self._width)
+        cutline += SvgBasics.lineRel(.5 * self._width, 0)
+
+        cutline += SvgBasics.moveAbs(2 * self._height - .5 * self._width, 2 * overlap * self._width + .5 * self._width + .25 * self._height)
+        cutline += SvgBasics.lineRel(0, .25 * self._height)
+
+        self._addPathToDocumentTree(style, cutline)
+
 
 
 # Create effect instance and apply it.

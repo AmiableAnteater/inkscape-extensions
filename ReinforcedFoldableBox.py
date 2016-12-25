@@ -25,9 +25,6 @@ class FoldableBox(SvgBasics.BaseEffectExtension):
     def __init__(self):
         SvgBasics.BaseEffectExtension.__init__(self, "ReinforcedFoldableBox.inx")
 
-
-
-
     def effect(self):
         self._height = self._conv(self.options.height)
         self._width = self._conv(self.options.width)
@@ -38,94 +35,113 @@ class FoldableBox(SvgBasics.BaseEffectExtension):
         overlap = .1
         overlapped_half = .5 + overlap
 
+        # The lid flap holds the two parts of the lid together, when the box is closed.
+        # TODO: unhandled error: this could be bigger thand self._width / 2
+        lidFlapSize = 2 * overlap * self._width
 
-        style = simplestyle.formatStyle({'stroke': '#000000', 'stroke-width': str(self._linewidth), 'fill': '#808080'})
+        # Section with dimensions of the side hook sides
+        self._sideHookFoldingGap = .05 * self._height
+        sideHookReducedHeight = self._height - 2 * self._sideHookFoldingGap
 
-        outline = SvgBasics.moveAbs(2 * self._height, 2 * overlap * self._width)
+        # the width of the hooks
+        self._sideHookWidth = 2 * overlap * self._width
+        # the vertical overlap of the hooks
+        sideHookOverlapFactor = .7
+        sideHookCutlineFactor = sideHookOverlapFactor - .5
+        self._sideHookOverlap = sideHookReducedHeight * sideHookOverlapFactor
+        self._sideHookGap = sideHookReducedHeight - self._sideHookOverlap
+        sideHookHeight = self._height - 2 * self._sideHookGap
+        self._sideWidthIncludingHook = self._width / 2 + self._sideHookWidth
+
+
+        startX = 2 * self._height
+        startY = lidFlapSize
+
+        outline = SvgBasics.moveAbs(startX, startY)
 
         # Top left flap
         outline += SvgBasics.circRel(.5 * self._width, False, False, -.5 * self._width, .5 * self._width)
+        outline += SvgBasics.lineRel(.5 * self._width, 0)
 
-        # second flap with latch
-        outline += SvgBasics.lineRel(0, .25 * self._height)
-        # this is the point to add a cut line
-        outline += SvgBasics.lineRel(-.3 * .5 * self._width, 0)
-        outline += SvgBasics.lineRel(0, .75 * self._height)
+        # side hook
+        outline += self.addLeftSideHook()
 
-        # central flap
-        outline += SvgBasics.lineRel(1.3 * .5 * self._width - 2 * self._height, 0)
+        # central flap that folds on itself and is kept in place by the semicircle cutout
+        outline += SvgBasics.lineRel(-2 * self._height, 0)
         outline += SvgBasics.lineRel(0, self._width)
         outline += SvgBasics.lineRel(2 * self._height, 0)
 
-        # second flap with latch  TODO - refactor
-        outline += SvgBasics.lineRel(-.5 * self._width, 0)
-        outline += SvgBasics.lineRel(0, overlapped_half * self._height)
-        outline += SvgBasics.moveRel(0, -overlap * self._height)
-        outline += SvgBasics.lineRel(- (1-latch_perc) * .5 * self._width, -overlap * self._height)
-        outline += SvgBasics.lineRel(-.1 * self._width, 0)
-        outline += SvgBasics.lineRel(0, overlapped_half * self._height)
-        outline += SvgBasics.lineRel(.1 * self._width + (1-latch_perc) * .5 * self._width + .5 * self._width, 0)
+        # side hook
+        outline += self.addLeftSideHook()
 
-        # Bottom left flap  TODO - refactor
-        outline += SvgBasics.lineRel(-latch_perc * self._height, (1 - latch_perc) * .25 * self._width)
-        outline += SvgBasics.lineRel(0, latch_perc * .5 * self._width)
-        outline += SvgBasics.lineRel(latch_perc * self._height, (1 - latch_perc) * .25 * self._width)
+        # lower left lid flap
+        outline += SvgBasics.lineRel(-.5 * self._width, 0)
+        outline += SvgBasics.circRel(.5 * self._width, False, False, .5 * self._width, .5 * self._width)
 
         # bottom half lid
         outline += SvgBasics.lineRel(.5 * self._depth, 0)
-        outline += SvgBasics.lineRel(0, overlap * self._width)
-        outline += SvgBasics.lineRel(.1 * self._depth, overlap * self._width)
-        outline += SvgBasics.lineRel(.4 * self._depth, -2 * overlap * self._width)
+        outline += SvgBasics.circRel(lidFlapSize, False, False, lidFlapSize, lidFlapSize)
+        outline += SvgBasics.arcRel(.5 * self._depth - lidFlapSize, lidFlapSize, 0, False, False, .5 * self._depth - lidFlapSize, -lidFlapSize)
 
-        # Bottom right flap  TODO - refactor
-        outline += SvgBasics.lineRel(latch_perc * self._height, -(1 - latch_perc) * .25 * self._width)
-        outline += SvgBasics.lineRel(0, -latch_perc * .5 * self._width)
-        outline += SvgBasics.lineRel(-latch_perc * self._height, -(1 - latch_perc) * .25 * self._width)
-
-        # second flap with latch  TODO - refactor
-        outline += SvgBasics.lineRel(.1 * self._width + (1-latch_perc) * .5 * self._width + .5 * self._width, 0)
-        outline += SvgBasics.lineRel(0, -overlapped_half * self._height)
-        outline += SvgBasics.lineRel(-.1 * self._width, 0)
-        outline += SvgBasics.lineRel(-(1-latch_perc) * .5 * self._width, overlap * self._height)
-        outline += SvgBasics.moveRel(0, overlap * self._height)
-        outline += SvgBasics.lineRel(0, -overlapped_half * self._height)
+        # lower right lid flap
+        outline += SvgBasics.circRel(.5 * self._width, False, False, .5 * self._width, -.5 * self._width)
         outline += SvgBasics.lineRel(-.5 * self._width, 0)
 
-        # central flap
+        # side hook
+        outline += self.addRightSideHook()
+
+        # central flap that folds on itself and is kept in place by the semicircle cutout
         outline += SvgBasics.lineRel(2 * self._height, 0)
         outline += SvgBasics.lineRel(0, -self._width)
         outline += SvgBasics.lineRel(-2 * self._height, 0)
 
-        # second flap with latch  TODO - refactor
-        outline += SvgBasics.lineRel(.1 * self._width + (1-latch_perc) * .5 * self._width + .5 * self._width, 0)
-        outline += SvgBasics.lineRel(0, -overlapped_half * self._height)
-        outline += SvgBasics.lineRel(-.1 * self._width, 0)
-        outline += SvgBasics.lineRel(-(1-latch_perc) * .5 * self._width, overlap * self._height)
-        outline += SvgBasics.moveRel(0, overlap * self._height)
-        outline += SvgBasics.lineRel(0, -overlapped_half * self._height)
-        outline += SvgBasics.lineRel(-.5 * self._width, 0)
+        # side hook
+        outline += self.addRightSideHook()
 
-        # Top right flap  TODO - refactor
-        outline += SvgBasics.lineRel(latch_perc * self._height, -(1 - latch_perc) * .25 * self._width)
-        outline += SvgBasics.lineRel(0, -latch_perc * .5 * self._width)
-        outline += SvgBasics.lineRel(-latch_perc * self._height, -(1 - latch_perc) * .25 * self._width)
+        # upper right lid flap
+        outline += SvgBasics.lineRel(.5 * self._width, 0)
+        outline += SvgBasics.circRel(.5 * self._width, False, False, -.5 * self._width, -.5 * self._width)
 
-        # top half lid
+        # bottom half lid
         outline += SvgBasics.lineRel(-.5 * self._depth, 0)
-        outline += SvgBasics.lineRel(0, -overlap * self._width)
-        outline += SvgBasics.lineRel(-.1 * self._depth, -overlap * self._width)
-        outline += SvgBasics.lineRel(-.4 * self._depth, 2 * overlap * self._width)
+        outline += SvgBasics.circRel(lidFlapSize, False, False, -lidFlapSize, -lidFlapSize)
+        outline += SvgBasics.arcRel(.5 * self._depth - lidFlapSize, lidFlapSize, 0, False, False, -(.5 * self._depth - lidFlapSize), lidFlapSize)
 
+        outline += ' z'
+
+        style = simplestyle.formatStyle({'stroke': '#000000', 'stroke-width': str(self._linewidth), 'fill': '#808080'})
         self._addPathToDocumentTree(style, outline)
 
-        cutline = SvgBasics.moveAbs(2 * self._height - .5 * self._width, 2 * overlap * self._width + .5 * self._width)
-        cutline += SvgBasics.lineRel(.5 * self._width, 0)
+        # cutline = SvgBasics.moveAbs(2 * self._height - .5 * self._width, startY + .5 * self._width)
+        # cutline += SvgBasics.lineRel(.5 * self._width, 0)
+        #
+        # cutline += SvgBasics.moveAbs(2 * self._height - .5 * self._width, startY + .5 * self._width + .25 * self._height)
+        # cutline += SvgBasics.lineRel(0, .25 * self._height)
+        #
+        # self._addPathToDocumentTree(style, cutline)
 
-        cutline += SvgBasics.moveAbs(2 * self._height - .5 * self._width, 2 * overlap * self._width + .5 * self._width + .25 * self._height)
-        cutline += SvgBasics.lineRel(0, .25 * self._height)
+    def addLeftSideHook(self):
+        # side flap with hook
+        sideHook = SvgBasics.lineRel(0, self._sideHookFoldingGap)
+        sideHook += SvgBasics.lineRel(-.5 * self._width, 0)
+        sideHook += SvgBasics.lineRel(0, self._sideHookGap)
+        # this is the point to add a cut line
+        sideHook += SvgBasics.lineRel(-self._sideHookWidth, 0)
+        sideHook += SvgBasics.lineRel(0, self._sideHookOverlap)
+        sideHook += SvgBasics.lineRel(self._sideWidthIncludingHook, 0)
+        sideHook += SvgBasics.lineRel(0, self._sideHookFoldingGap)
+        return sideHook
 
-        self._addPathToDocumentTree(style, cutline)
-
+    def addRightSideHook(self):
+        # side flap with hook
+        sideHook = SvgBasics.lineRel(0, -self._sideHookFoldingGap)
+        sideHook += SvgBasics.lineRel(self._sideWidthIncludingHook, 0)
+        sideHook += SvgBasics.lineRel(0, -self._sideHookOverlap)
+        sideHook += SvgBasics.lineRel(-self._sideHookWidth, 0)
+        sideHook += SvgBasics.lineRel(0, -self._sideHookGap)
+        sideHook += SvgBasics.lineRel(-.5 * self._width, 0)
+        sideHook += SvgBasics.lineRel(0, -self._sideHookFoldingGap)
+        return sideHook
 
 
 # Create effect instance and apply it.

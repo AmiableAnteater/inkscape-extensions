@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<inkscape-extension xmlns="http://www.inkscape.org/namespace/inkscape/extension">
+    <_name>Foldable Box Creator</_name>
+    <id>AmiableAnteater.lasertools.foldable_box</id>
+
+    <param name="unit" _gui-text="Unit" type="enum">
+        <item value="mm">mm</item>
+        <item value="cm">cm</item>
+        <item value="in">in</item>
+    </param>
+
+    <param name="height" type="float" precision="3" min="1.0" max="1000.0" _gui-text="Height">25.0</param>
+    <param name="width" type="float" precision="3" min="1.0" max="1000.0" _gui-text="Width">50.0</param>
+    <param name="depth" type="float" precision="3" min="1.0" max="1000.0" _gui-text="Depth">80.0</param>
+
+    <param name="linewidth" type="float" precision="3" min="0.0" max="3.0" _gui-text="Width of lines">0.5</param>
+
+    <effect>
+        <object-type>all</object-type>
+        <effects-menu>
+            <submenu _name="FabLab Laser Tools"/>
+        </effects-menu>
+    </effect>
+
+    <script>
+        <command reldir="extensions" interpreter="python">ReinforcedFoldableBox.py</command>
+    </script>
+</inkscape-extension>

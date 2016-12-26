@@ -30,12 +30,9 @@ class FoldableBox(SvgBasics.BaseEffectExtension):
         self._depth = self._conv(self.options.depth)
         self._linewidth = self._conv(self.options.linewidth)
 
-        latch_perc = .8
         overlap = .1
-        overlapped_half = .5 + overlap
 
         # The lid flap holds the two parts of the lid together, when the box is closed.
-        # TODO: unhandled error: this could be bigger than self._width / 2
         lidFlapSize = 2 * overlap * self._width
 
         # Section with dimensions of the side hook sides
@@ -50,7 +47,6 @@ class FoldableBox(SvgBasics.BaseEffectExtension):
         self._sideHookOverlap = sideHookReducedHeight * sideHookOverlapFactor
         sideHookCutlineLength = sideHookReducedHeight * sideHookCutlineFactor
         self._sideHookGap = sideHookReducedHeight - self._sideHookOverlap
-        sideHookHeight = self._height - 2 * self._sideHookGap
         self._sideWidthIncludingHook = self._width / 2 + self._sideHookWidth
 
         startX = 2 * self._height
@@ -59,23 +55,21 @@ class FoldableBox(SvgBasics.BaseEffectExtension):
         outline = SvgBasics.moveAbs(startX, startY)
 
         # Top left flap
-        outline += SvgBasics.circRel(.5 * self._width, False, False, -.5 * self._width, .5 * self._width)
-        outline += SvgBasics.lineRel(.5 * self._width, 0)
+        outline += SvgBasics.arcRel(self._height, .5 * self._width, 0, False, False, -self._height, .5 * self._width)
+        outline += SvgBasics.lineRel(self._height, 0)
 
         # side hook
         outline += self.addLeftSideHook()
 
         # central flap that folds on itself and is kept in place by the semicircle cutout
-        outline += SvgBasics.lineRel(-2 * self._height, 0)
-        outline += SvgBasics.lineRel(0, self._width)
-        outline += SvgBasics.lineRel(2 * self._height, 0)
+        outline += self._addCentralFlap(1)
 
         # side hook
         outline += self.addLeftSideHook()
 
         # lower left lid flap
-        outline += SvgBasics.lineRel(-.5 * self._width, 0)
-        outline += SvgBasics.circRel(.5 * self._width, False, False, .5 * self._width, .5 * self._width)
+        outline += SvgBasics.lineRel(-self._height, 0)
+        outline += SvgBasics.arcRel(self._height, .5 * self._width, 0, False, False, self._height, .5 * self._width)
 
         # bottom half lid
         outline += SvgBasics.lineRel(.5 * self._depth, 0)
@@ -83,23 +77,21 @@ class FoldableBox(SvgBasics.BaseEffectExtension):
         outline += SvgBasics.arcRel(.5 * self._depth - lidFlapSize, lidFlapSize, 0, False, False, .5 * self._depth - lidFlapSize, -lidFlapSize)
 
         # lower right lid flap
-        outline += SvgBasics.circRel(.5 * self._width, False, False, .5 * self._width, -.5 * self._width)
-        outline += SvgBasics.lineRel(-.5 * self._width, 0)
+        outline += SvgBasics.arcRel(self._height, .5 * self._width, 0, False, False, self._height, -.5 * self._width)
+        outline += SvgBasics.lineRel(-self._height, 0)
 
         # side hook
         outline += self.addRightSideHook()
 
         # central flap that folds on itself and is kept in place by the semicircle cutout
-        outline += SvgBasics.lineRel(2 * self._height, 0)
-        outline += SvgBasics.lineRel(0, -self._width)
-        outline += SvgBasics.lineRel(-2 * self._height, 0)
+        outline += self._addCentralFlap(-1)
 
         # side hook
         outline += self.addRightSideHook()
 
         # upper right lid flap
-        outline += SvgBasics.lineRel(.5 * self._width, 0)
-        outline += SvgBasics.circRel(.5 * self._width, False, False, -.5 * self._width, -.5 * self._width)
+        outline += SvgBasics.lineRel(self._height, 0)
+        outline += SvgBasics.arcRel(self._height, .5 * self._width, 0, False, False, -self._height, -.5 * self._width)
 
         # bottom half lid
         outline += SvgBasics.lineRel(-.5 * self._depth, 0)
@@ -132,6 +124,49 @@ class FoldableBox(SvgBasics.BaseEffectExtension):
         style = simplestyle.formatStyle({'stroke': '#000000', 'stroke-width': str(self._linewidth), 'fill': '#808080'})
         self._addPathToDocumentTree(style, outline)
 
+        foldline = SvgBasics.moveAbs(startX + self._depth / 2, startY)
+        foldline += SvgBasics.lineRel(-self._depth / 2, 0)
+        foldline += SvgBasics.lineRel(0, self._width / 2)
+        foldline += SvgBasics.lineRel(self._depth, 0)
+        foldline += SvgBasics.lineRel(0, -self._width / 2)
+
+        foldline += SvgBasics.moveAbs(startX, startY + self._width / 2 + self._sideHookFoldingGap)
+        foldline += SvgBasics.lineRel(0, sideHookReducedHeight)
+        foldline += SvgBasics.moveRel(self._depth, -sideHookReducedHeight)
+        foldline += SvgBasics.lineRel(0, sideHookReducedHeight)
+        foldline += SvgBasics.moveRel(0, self._sideHookFoldingGap)
+        foldline += SvgBasics.lineRel(-self._depth,0)
+
+        foldline += SvgBasics.moveRel(-self._height, 0)
+        foldline += SvgBasics.lineRel(0, self._width)
+        foldline += SvgBasics.moveRel(self._height, 0)
+        foldline += SvgBasics.lineRel(0, -self._width)
+        foldline += SvgBasics.moveRel(self._depth, 0)
+        foldline += SvgBasics.lineRel(0, self._width)
+        foldline += SvgBasics.moveRel(self._height, 0)
+        foldline += SvgBasics.lineRel(0, -self._width)
+        foldline += SvgBasics.moveRel(-self._height ,self._width)
+        foldline += SvgBasics.lineRel(-self._depth, 0)
+
+        foldline += SvgBasics.moveRel(0, self._sideHookFoldingGap)
+        foldline += SvgBasics.lineRel(0, sideHookReducedHeight)
+        foldline += SvgBasics.moveRel(self._depth, 0)
+        foldline += SvgBasics.lineRel(0, -sideHookReducedHeight)
+
+        foldline += SvgBasics.moveRel(-self._depth / 2, self._sideHookFoldingGap + sideHookReducedHeight + self._width / 2)
+        foldline += SvgBasics.lineRel(self._depth / 2, 0)
+        foldline += SvgBasics.lineRel(0, -self._width / 2)
+        foldline += SvgBasics.lineRel(-self._depth, 0)
+        foldline += SvgBasics.lineRel(0, self._width / 2)
+
+        style = simplestyle.formatStyle({'stroke': '#FF0000', 'stroke-width': str(self._linewidth), 'fill': 'none'})
+        self._addPathToDocumentTree(style, foldline)
+
+    def _addCentralFlap(self, factor):
+        centralFlap = SvgBasics.lineRel(factor * -2 * self._height, 0)
+        centralFlap += SvgBasics.lineRel(0, factor * self._width)
+        centralFlap += SvgBasics.lineRel(factor * 2 * self._height, 0)
+        return centralFlap
 
     def addLeftSideHook(self):
         # side flap with hook

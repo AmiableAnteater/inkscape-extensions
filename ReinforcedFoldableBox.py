@@ -17,7 +17,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import SvgBasics
-import inkex
 import simplestyle
 
 
@@ -36,7 +35,7 @@ class FoldableBox(SvgBasics.BaseEffectExtension):
         overlapped_half = .5 + overlap
 
         # The lid flap holds the two parts of the lid together, when the box is closed.
-        # TODO: unhandled error: this could be bigger thand self._width / 2
+        # TODO: unhandled error: this could be bigger than self._width / 2
         lidFlapSize = 2 * overlap * self._width
 
         # Section with dimensions of the side hook sides
@@ -49,10 +48,10 @@ class FoldableBox(SvgBasics.BaseEffectExtension):
         sideHookOverlapFactor = .7
         sideHookCutlineFactor = sideHookOverlapFactor - .5
         self._sideHookOverlap = sideHookReducedHeight * sideHookOverlapFactor
+        sideHookCutlineLength = sideHookReducedHeight * sideHookCutlineFactor
         self._sideHookGap = sideHookReducedHeight - self._sideHookOverlap
         sideHookHeight = self._height - 2 * self._sideHookGap
         self._sideWidthIncludingHook = self._width / 2 + self._sideHookWidth
-
 
         startX = 2 * self._height
         startY = lidFlapSize
@@ -107,18 +106,32 @@ class FoldableBox(SvgBasics.BaseEffectExtension):
         outline += SvgBasics.circRel(lidFlapSize, False, False, -lidFlapSize, -lidFlapSize)
         outline += SvgBasics.arcRel(.5 * self._depth - lidFlapSize, lidFlapSize, 0, False, False, -(.5 * self._depth - lidFlapSize), lidFlapSize)
 
-        outline += ' z'
+        outline += ' z '
+
+        firstCutLineVerticalOffset = startY + self._width / 2 + self._sideHookFoldingGap + self._sideHookGap
+        secondCutLineVerticalOffset = startY + self._width * 1.5 + self._height + self._sideHookFoldingGap + self._sideHookGap
+        leftCutLineHorizontalOffset = 2 * self._height - self._width / 2
+        rightCutLineHorizontalOffset = leftCutLineHorizontalOffset + self._depth + self._width
+        outline += SvgBasics.moveAbs(leftCutLineHorizontalOffset, firstCutLineVerticalOffset)
+        outline += SvgBasics.lineRel(0, sideHookCutlineLength)
+        outline += SvgBasics.moveAbs(rightCutLineHorizontalOffset, firstCutLineVerticalOffset)
+        outline += SvgBasics.lineRel(0, sideHookCutlineLength)
+        outline += SvgBasics.moveAbs(leftCutLineHorizontalOffset, secondCutLineVerticalOffset)
+        outline += SvgBasics.lineRel(0, sideHookCutlineLength)
+        outline += SvgBasics.moveAbs(rightCutLineHorizontalOffset, secondCutLineVerticalOffset)
+        outline += SvgBasics.lineRel(0, sideHookCutlineLength)
+
+        centralArcRadius = self._width / 10
+        centralArcX = 2 * self._height
+        centralArcY = startY + self._width + self._height - centralArcRadius
+        outline += SvgBasics.moveAbs(centralArcX, centralArcY)
+        outline += SvgBasics.circRel(centralArcRadius, False, False, 0, 2 * centralArcRadius)
+        outline += SvgBasics.moveRel(self._depth, 0)
+        outline += SvgBasics.circRel(centralArcRadius, False, False, 0, -2 * centralArcRadius)
 
         style = simplestyle.formatStyle({'stroke': '#000000', 'stroke-width': str(self._linewidth), 'fill': '#808080'})
         self._addPathToDocumentTree(style, outline)
 
-        # cutline = SvgBasics.moveAbs(2 * self._height - .5 * self._width, startY + .5 * self._width)
-        # cutline += SvgBasics.lineRel(.5 * self._width, 0)
-        #
-        # cutline += SvgBasics.moveAbs(2 * self._height - .5 * self._width, startY + .5 * self._width + .25 * self._height)
-        # cutline += SvgBasics.lineRel(0, .25 * self._height)
-        #
-        # self._addPathToDocumentTree(style, cutline)
 
     def addLeftSideHook(self):
         # side flap with hook

@@ -72,6 +72,18 @@ def moveAbs(x, y):
     return ' M ' + formatCoordinates(x, y)
 
 
+def createTab(width, height):
+    tab = lineRel(width, 0) + lineRel(0, height) + lineRel(-width, 0)
+    return tab
+
+
+def createRect(width, height, close=True):
+    rect = createTab(width, height) + lineRel(0, -height)
+    if close:
+        rect += ' z'
+    return rect
+
+
 class BaseEffectExtension(inkex.Effect):
     def __init__(self, inxFile, useDebugLogging=False):
         inkex.Effect.__init__(self)

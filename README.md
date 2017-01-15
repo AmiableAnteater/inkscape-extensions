@@ -1,10 +1,13 @@
 # inkscape-extensions
 
+This is a collection of extensions for the vector drawing application [Inkscape](https://inkscape.org/).
+All extensions create shapes used for laser cutting.
+
 ## Installation
 
 1. Download a ZIP of this repository (or clone it) using the green button on the top right.
 1. Unpack the ZIP.
-1. Copy all *.py and *.inx files into the *<Inkscape installation folder>*/share/extensions directory. 
+1. Copy all *.py and *.inx files into the *&lt;Inkscape installation folder>*/share/extensions directory.
 1. (Re-)Start Inkscape
 1. Under the menu "Extensions" there is now a sub-menu "FabLab Laser Tools", which contains these extensions.
 

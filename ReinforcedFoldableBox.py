@@ -191,7 +191,6 @@ class FoldableBox(SvgBasics.BaseEffectExtension):
         sideHook += SvgBasics.lineRel(0, -self._sideHookFoldingGap)
         return sideHook
 
-
 # Create effect instance and apply it.
 effect = FoldableBox()
 effect.affect()

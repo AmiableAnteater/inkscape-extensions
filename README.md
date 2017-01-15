@@ -17,6 +17,12 @@ All extensions create shapes used for laser cutting.
 Creates a tabbed box with or without lid.
 Parts can be laid out to avoid waste of material.
 
+## Tab Lines
+
+This is an addition to LaserBox for creating tabs and fitting cutouts.
+You can use this extension to reduce the amount of tedious and
+repetitive tasks when creating drawers etc.
+
 
 ## Penrose Tiling
 

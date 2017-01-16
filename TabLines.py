@@ -32,8 +32,9 @@ class TabLines(SvgBasics.BaseEffectExtension):
         trailingOffset = self._conv(self.options.trailingOffset)
         linewidth = self._conv(self.options.linewidth)
 
-        line = SvgBasics.moveAbs(thickness, thickness)
-        cutouts = SvgBasics.moveAbs(3 * thickness, thickness)
+        offsetForClosedBox = 1 if self.options.createClosedShape else 0
+        line = SvgBasics.moveAbs((1 + offsetForClosedBox) * thickness, thickness)
+        cutouts = SvgBasics.moveAbs((3 + offsetForClosedBox) * thickness, thickness)
 
         line += SvgBasics.lineRel(0, leadingOffset)
         cutouts += SvgBasics.moveRel(0, leadingOffset)
@@ -49,6 +50,13 @@ class TabLines(SvgBasics.BaseEffectExtension):
 
         style = simplestyle.formatStyle(
             {'stroke': '#000000', 'stroke-width': str(linewidth), 'fill': 'none'})
+
+        if self.options.createClosedShape:
+            line += SvgBasics.lineRel(-thickness,0)
+            line += SvgBasics.lineRel(0, -trailingOffset - self.options.countTabs * lengthOfTabs - (self.options.countTabs - 1) * lengthOfGaps - leadingOffset)
+            line += SvgBasics.lineRel(thickness,0)
+            line += ' z'
+
         self._addPathToDocumentTree(style, line)
         self._addPathToDocumentTree(style, cutouts)
 

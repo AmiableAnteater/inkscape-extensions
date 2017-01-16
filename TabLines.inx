@@ -15,6 +15,7 @@
     <param name="lengthOfGaps" type="float" precision="3" min="0.0" max="10000.0" _gui-text="Length of gaps">7.0</param>
     <param name="countTabs" type="int" min="1.0" max="50" _gui-text="Number of tabs">10</param>
     <param name="trailingOffset" type="float" precision="3" min="0.0" max="10000.0" _gui-text="Offset after last tab">0.0</param>
+    <param name="createClosedShape" type="boolean" _gui-text="Create closed shape">true</param>
     <param name="linewidth" type="float" precision="5" min="0.0" max="1.0" _gui-text="Linewidth">0.01</param>
 
     <effect>

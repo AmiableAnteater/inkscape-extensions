@@ -44,13 +44,18 @@ class Dimensions(object):
 
 class LatticeLivingHinges(SvgBasics.BaseEffectExtension):
     def __init__(self):
-        SvgBasics.BaseEffectExtension.__init__(self, 'LatticeLivingHinges.inx')
+        SvgBasics.BaseEffectExtension.__init__(self, 'LatticeLivingHinges.inx', True)
         self._epsilon = None
         self._lineWidth = None
         self._hingeHeight = None
         self._hSpacing0 = None
         self._hSpacing1 = None
 
+    def _handleOption(self, param, paramName):
+        if paramName == 'active-tab':
+            self.OptionParser.add_option('--active-tab', action='store', dest='___unused')
+        return paramName == 'active-tab'    
+        
     def _isBottomReached(self, absoluteY):
         self.log({'absoluteY':absoluteY, 'self._hingeHeight':self._hingeHeight, 'self._epsilon':self._epsilon,
                   'retval:':absoluteY >= self._hingeHeight - self._epsilon})

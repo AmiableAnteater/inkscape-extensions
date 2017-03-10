@@ -12,7 +12,11 @@
             </param>
 
             <param name="useHairlines" type="boolean" _gui-text="Use hairlines instead of cut-outs?"
-                   _gui-description="If this box is checked, the openings of the lattice structure will be generated single lines instead of outlines All width parameters for the cuts will be ignored">
+                   _gui-description="If this box is checked, the openings of the lattice structure will be generated single lines instead of outlines. All width parameters for the cuts will be ignored.">
+                true
+            </param>
+
+            <param name="drawBorders" type="boolean" _gui-text="Draw borders at top and bottom?">
                 true
             </param>
 

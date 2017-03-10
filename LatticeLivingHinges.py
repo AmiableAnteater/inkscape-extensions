@@ -90,8 +90,8 @@ class LatticeLivingHinges(SvgBasics.BaseEffectExtension):
         return cut
     ####################################################################################
 
-    @staticmethod
-    def _createArcCutoff(availableHeight, dimensions, isDirIncX, isDirIncY):
+    def _createArcCutoff(self, availableHeight, dimensions, isDirIncX, isDirIncY):
+
         x = dimensions.inksRadius - math.sqrt(
             dimensions.inksRadius * dimensions.inksRadius - availableHeight * availableHeight)
         cutoffWidth = dimensions.inksWidth - 2 * x
@@ -101,32 +101,47 @@ class LatticeLivingHinges(SvgBasics.BaseEffectExtension):
         if not isDirIncY:
             availableHeight *= -1
         cut = SvgBasics.circRel(dimensions.inksRadius, False, False, x, availableHeight)
-        cut += SvgBasics.lineRel(cutoffWidth, 0)
+        if self.options.drawBorders:
+            cut += SvgBasics.moveRel(cutoffWidth, 0)
+        else:
+            cut += SvgBasics.lineRel(cutoffWidth, 0)
         cut += SvgBasics.circRel(dimensions.inksRadius, False, False, x, -availableHeight)
         return cut
 
     def _createWideCuts(self, dimensions):
+        """
+        Generates a single column of wide cuts. Wide cuts start below the top arc on the left side with a
+        downward line and continue with the bottom arc, an upward line and the top arc.
+        """
         cut = ''
         if -dimensions.inksVoffset > dimensions.inksLength:
+            # first cut would be completely hidden
             inksCurrentY = dimensions.inksLength + dimensions.inksVspacing + dimensions.inksRadius + \
                            dimensions.inksVoffset
             cut += SvgBasics.moveRel(0, inksCurrentY)
         elif -dimensions.inksVoffset > dimensions.inksLengthWithoutRadii + dimensions.inksRadius:
+            # only bottom arc is visible
             arcCenterY = dimensions.inksVoffset + dimensions.inksLengthWithoutRadii + dimensions.inksRadius
             arcStartX = dimensions.inksRadius - math.sqrt(dimensions.inksRadius * dimensions.inksRadius -
                                                           arcCenterY * arcCenterY)
             arcRelEndX = dimensions.inksWidth - 2 * arcStartX
             cut += SvgBasics.moveRel(arcStartX, 0)
-            cut += SvgBasics.circRel(dimensions.inksRadius, False, False, arcRelEndX, 0) + ' z '
+            cut += SvgBasics.circRel(dimensions.inksRadius, False, False, arcRelEndX, 0)
             inksCurrentY = 2 * dimensions.inksRadius + arcCenterY + dimensions.inksVspacing
-            cut += SvgBasics.moveRel(-arcStartX, inksCurrentY)
+            if self.options.drawBorders:
+                cut += SvgBasics.moveRel(-arcStartX-arcRelEndX, inksCurrentY)
+            else:
+                cut += ' z ' + SvgBasics.moveRel(-arcStartX, inksCurrentY)
         elif -dimensions.inksVoffset > dimensions.inksRadius:
             cutLength = dimensions.inksLengthWithoutRadii + dimensions.inksRadius + dimensions.inksVoffset
             cut += SvgBasics.lineRel(0, cutLength)
             cut += SvgBasics.circRel(dimensions.inksRadius, True, False, dimensions.inksWidth, 0)
-            cut += SvgBasics.lineRel(0, -cutLength) + ' z '
+            cut += SvgBasics.lineRel(0, -cutLength)
             inksCurrentY = cutLength + 2 * dimensions.inksRadius + dimensions.inksVspacing
-            cut += SvgBasics.moveRel(0, inksCurrentY)
+            if self.options.drawBorders:
+                cut += SvgBasics.moveRel(-dimensions.inksWidth, inksCurrentY)
+            else:
+                cut += ' z ' + SvgBasics.moveRel(0, inksCurrentY)
         else:
             inksCurrentY = dimensions.inksRadius + dimensions.inksVoffset
             cut += SvgBasics.moveRel(0, inksCurrentY)
@@ -134,21 +149,22 @@ class LatticeLivingHinges(SvgBasics.BaseEffectExtension):
             if self._isBottomReached(inksCurrentY + dimensions.inksLengthWithoutRadii):
                 cutLength = self._hingeHeight - inksCurrentY
                 cut += SvgBasics.lineRel(0, cutLength)
-                cut += SvgBasics.lineRel(dimensions.inksWidth, 0)
+                cut += SvgBasics.moveRel(dimensions.inksWidth, 0) if self.options.drawBorders else SvgBasics.lineRel(dimensions.inksWidth, 0)
                 cut += SvgBasics.lineRel(0, -cutLength)
             else:
                 cut += SvgBasics.lineRel(0, dimensions.inksLengthWithoutRadii)
                 if self._isBottomReached(inksCurrentY + dimensions.inksLengthWithoutRadii + dimensions.inksRadius):
                     availableHeight = self._hingeHeight - (inksCurrentY + dimensions.inksLengthWithoutRadii)
-                    cut += LatticeLivingHinges._createArcCutoff(availableHeight, dimensions, True, True)
+                    cut += self._createArcCutoff(availableHeight, dimensions, True, True)
                 else:
                     cut += SvgBasics.circRel(dimensions.inksRadius, True, False, dimensions.inksWidth, 0)
                 cut += SvgBasics.lineRel(0, -dimensions.inksLengthWithoutRadii)
             if inksCurrentY < dimensions.inksRadius:
-                cut += LatticeLivingHinges._createArcCutoff(inksCurrentY, dimensions, False, False)
+                cut += self._createArcCutoff(inksCurrentY, dimensions, False, False)
             else:
                 cut += SvgBasics.circRel(dimensions.inksRadius, True, False, -dimensions.inksWidth, 0)
-            cut += ' z '
+            if not self.options.drawBorders:
+                cut += ' z '
             if self._isBottomReached(inksCurrentY + dimensions.totalHeight):
                 # the top arc of the next cut might still be visible
                 if not self._isBottomReached(inksCurrentY + dimensions.totalHeight - dimensions.inksRadius):
@@ -157,7 +173,9 @@ class LatticeLivingHinges(SvgBasics.BaseEffectExtension):
                                                                   arcCenterY * arcCenterY)
                     arcRelEndX = dimensions.inksWidth - 2 * arcStartX
                     cut += SvgBasics.moveRel(arcStartX, self._hingeHeight - inksCurrentY)
-                    cut += SvgBasics.circRel(dimensions.inksRadius, False, True, arcRelEndX, 0) + ' z '
+                    cut += SvgBasics.circRel(dimensions.inksRadius, False, True, arcRelEndX, 0)
+                    if not self.options.drawBorders:
+                        cut += ' z '
             else:
                 cut += SvgBasics.moveRel(0, dimensions.totalHeight)
             inksCurrentY += dimensions.totalHeight
@@ -201,6 +219,9 @@ class LatticeLivingHinges(SvgBasics.BaseEffectExtension):
             currentX += self._hSpacing0
             self._addPathToDocumentTree(style, 'M ' + str(currentX) + ',0' + evenCuts)
             currentX += self._hSpacing1
+        if self.options.drawBorders:
+            self._addPathToDocumentTree(style, 'M 0,0 ' + SvgBasics.lineRel(currentX, 0) +
+                                        SvgBasics.moveRel(0, self._hingeHeight) + SvgBasics.lineRel(-currentX, 0))
 
 
 # Create effect instance and apply it.

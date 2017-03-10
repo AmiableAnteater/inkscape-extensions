@@ -44,7 +44,7 @@ class Dimensions(object):
 
 class LatticeLivingHinges(SvgBasics.BaseEffectExtension):
     def __init__(self):
-        SvgBasics.BaseEffectExtension.__init__(self, 'LatticeLivingHinges.inx', True)
+        SvgBasics.BaseEffectExtension.__init__(self, 'LatticeLivingHinges.inx', False)
         self._epsilon = None
         self._lineWidth = None
         self._hingeHeight = None
